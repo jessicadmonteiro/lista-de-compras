@@ -1,19 +1,20 @@
 import { Request, Response } from "express";
 import { listData } from "./database";
-import { iList, iListRequest, ListRequiredKey } from "./interfaces";
+import { iList, iListRequest, ListRequiredKey} from "./interfaces";
 
-const validateData = (payload: any): iList => {
+const validateData = (payload: any): iListRequest => {
   const payloadKeys: string[] = Object.keys(payload);
+  const listRequiredKeys: ListRequiredKey[] = ["listName", "data"];
 
-  const requiredKeys: ListRequiredKey[] = ["listName", "data"];
-  const hasRequiredKeys: boolean = requiredKeys.every((key: string) => payloadKeys.includes(key));
+  const hasRequiredKeys: boolean = listRequiredKeys.every((key: string) => payloadKeys.includes(key));
+
   const lengthPayload = payloadKeys.length === 2
 
   if (!hasRequiredKeys || !lengthPayload) {
-    const joinedkeys: string = requiredKeys.join(", ");
+    const joinedkeys: string = listRequiredKeys.join(", ");
     throw new Error (`Required keys are: ${joinedkeys}.`)
   };
-  
+ 
   return payload;
 };
 
@@ -115,7 +116,7 @@ const deleteItemList = (request: Request, response: Response): Response => {
   const indexItem: number | undefined = data?.findIndex(element => element.name === name);
 
   if( indexItem === -1){
-    return response.status(400).json({message: `${name} not found`});
+    return response.status(404).json({message: `${name} not found`});
   };
 
   data?.splice(indexItem? indexItem: 0, 1);
